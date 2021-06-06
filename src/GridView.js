@@ -1,16 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import {
-	SafeAreaView,
-	ScrollView,
-	StatusBar,
 	StyleSheet,
 	Text,
-	useColorScheme,
 	View,
 	Image,
-	Button,
 	TouchableOpacity,
-	Dimensions
+	Dimensions,
+	Linking
 } from 'react-native';
 
 const {width, height} = Dimensions.get("window");
@@ -18,30 +14,60 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator();
+import { useIsFocused } from "@react-navigation/native";
 
 import ScannerView from "./ScannerView";
 function GridView({navigation}) {
-	const [initialLoading, setInitialLoading] = useState(true);
 	const [docList, setDocList] = useState([]);
-
+	const isFocused = useIsFocused();
 	useEffect(() => {
 		// get old scanned docs
+		getDocs();
+	},[isFocused]);
 
-	},[]);
+	const getDocs = () => {
+		AsyncStorage.getAllKeys().then((list) => {
+			AsyncStorage.multiGet(list).then((dataList) => {
+				setDocList(dataList);
+			});
+		});
+	}
 
 	const uploadNewDoc = () => {
 		// launch Scanner
 		navigation.navigate("Scan")
 	}
 
+	const openDoc = (filePath) => {
+		Linking.canOpenURL(filePath).then((supported) => {
+			console.log("supported :: ", supported, filePath)
+			Linking.openURL("content://media/internal/images/media");
+		})
+	}
+
+	const docsPreview = docList.map(([fileName, path]) => {
+		return (
+			<TouchableOpacity key={fileName} style={styles.docThumbnailWrapper} onPress={() => {openDoc(path)}}>
+				<Image
+					 source={{ uri:  path}}
+					 resizeMode="contain"
+					 style={{flex: 1, backgroundColor: '#EFEFEF'}}
+				 />
+				<Text>{fileName}</Text>
+			</TouchableOpacity>
+		)
+	})
 	return (
 		<View style={{flex: 1, padding: 10, }}>
-			<TouchableOpacity 
-			onPress={uploadNewDoc}
-			style={{width: 200, height: 200, borderWidth: 1,alignItems: 'center', justifyContent: 'center', borderRadius: 10, }}>
-				<Text>+</Text>
-				<Text>Upload new doc here</Text>
-			</TouchableOpacity>
+			<View style={{flexDirection: 'row', flexWrap: 'wrap'}}>
+				<TouchableOpacity 
+				onPress={uploadNewDoc}
+				style={[styles.docThumbnailWrapper, styles.addNewDoc]}>
+					<Text>+</Text>
+					<Text>Upload new doc here</Text>
+				</TouchableOpacity>
+				{docsPreview}
+			</View>
 		</View>
 	)
 }
@@ -66,6 +92,17 @@ const styles = StyleSheet.create({
 	scanner:{
 		flex: 1,
 		backgroundColor: 'red'
+	},
+	docThumbnailWrapper: {
+		width: width/2 - 40, 
+		height: width/2 - 40, 
+		borderWidth: 1,
+		margin: 10,
+		borderRadius: 5
+	},
+	addNewDoc: {
+		alignItems: 'center',
+		justifyContent: 'center'
 	}
 });
 
