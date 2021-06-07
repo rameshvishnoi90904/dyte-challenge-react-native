@@ -6,7 +6,8 @@ import {
 	Image,
 	TouchableOpacity,
 	Dimensions,
-	Modal
+	Modal,
+	PermissionsAndroid
 } from 'react-native';
 
 const {width, height} = Dimensions.get("window");
@@ -52,6 +53,19 @@ function GridView({navigation}) {
 		setToPreview({});
 	}
 
+	const checkReadContactsPermission = async ()=>{    
+		const result =  await PermissionsAndroid.check(PermissionsAndroid.PERMISSIONS.CAMERA);
+		return result;
+	}
+
+	useEffect(() => {
+		checkReadContactsPermission().then((granted) => {
+			if (!granted) {
+				PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.CAMERA);
+			}
+		});
+	},[])
+
 
 	const previewDocModal = (
 		<Modal
@@ -85,7 +99,7 @@ function GridView({navigation}) {
 				<Image
 					 source={{ uri:  path}}
 					 resizeMode="cover"
-					 style={{flex: 1, backgroundColor: 'green', borderTopLeftRadius: 5, borderTopRightRadius: 5}}
+					 style={{flex: 1, borderTopLeftRadius: 5, borderTopRightRadius: 5}}
 				 />
 				 <View style={styles.fileNameContainer}>
 					 <Text style={styles.fileNameText}>{fileName}</Text>

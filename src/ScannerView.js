@@ -8,7 +8,8 @@
    Dimensions,
    Modal,
    TextInput,
-   ActivityIndicator
+   ActivityIndicator,
+   PermissionsAndroid
  } from 'react-native';
  
  const {width, height} = Dimensions.get("window");
@@ -25,6 +26,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 	 const cancelSelection = () => {
 		 setInfo({});
 	 }
+
+	
 	 
 	const triggerSave = () => {
 		// save info.image
@@ -78,7 +81,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 		</Modal>
 	)
    return (
-	 <View style={{flex: 1, backgroundColor:'red'}}>
+	 <View style={{flex: 1, backgroundColor: 'white'}}>
 		 {
 			 (info.image) ?
 			 <>
@@ -101,7 +104,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 			 <>
 				 <DocumentScanner
 					 ref={docRef}
-					 style={{flex:1}}
+					 style={{flex:1, backgroundColor: 'white'}}
 					 useBase64={true}
 					 saveInAppDocument={false}
 					 onPictureTaken={data =>
@@ -156,7 +159,6 @@ const styles = StyleSheet.create({
 	},
 	scanner:{
 		flex: 1,
-		backgroundColor: 'red'
 	},
 	centeredView: {
 		flex: 1,
