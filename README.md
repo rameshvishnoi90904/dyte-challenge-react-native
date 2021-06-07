@@ -6,7 +6,7 @@
 
 
 ## Setup 
-1. git clone
+1. git clone git@github.com:rameshvishnoi90904/dyte-challenge-react-native.git
 2. npm install
 3. npx react-native start
 4. npx react-native run-android
